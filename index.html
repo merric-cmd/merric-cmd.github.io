@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MERRIC COSTA // Computer Engineer</title>
+<meta name="description" content="Portfolio of Merric Costa — Computer Engineering student, software development, cloud computing and emerging technologies." />
+
+<!-- Fonts: Orbitron (display) + Share Tech Mono (terminal) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+
+<!-- FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+<!-- GSAP + ScrollTrigger -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+/* ============================================================
+   ROOT / THEME — CYBERPUNK
+   ============================================================ */
+:root {
+  --accent-color: #00ff9c;            /* neon green */
+  --accent-dim: rgba(0, 255, 156, 0.35);
+  --accent-glow: rgba(0, 255, 156, 0.65);
+  --navy-deep: #04070f;               /* darkest navy */
+  --navy: #070d1f;                   /* page background */
+  --navy-panel: #0b1430;              /* panels */
+  --navy-light: #16224a;             /* borders/hovers */
+  --text-main: #d7e4ff;
+  --text-dim: #7d8cb3;
+  --danger: #ff2e63;                 /* cyberpunk pink secondary */
+  --cyan: #00e5ff;                   /* cyberpunk cyan secondary */
+  --font-display: 'Orbitron', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
+}
+
+/* ============================================================
+   RESET / BASE
+   ============================================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--navy);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* hide default cursor everywhere — custom cursor takes over */
+body, a, button, .tilt-card, input, textarea {
+  cursor: none !important;
+}
+
+/* Text selection — accent green */
+::selection {
+  background: var(--accent-color);
+  color: #04140c; /* near-black green for contrast on neon green */
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--navy-deep); }
+::-webkit-scrollbar-thumb {
+  background: var(--navy-light);
+  border: 2px solid var(--navy-deep);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
+
+/* ============================================================
+   BACKGROUND FX — grid, scanlines, vignette
+   ============================================================ */
+.bg-fx { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 255, 156, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 156, 0.045) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, #000 40%, transparent 100%);
+}
+
+.bg-scanlines {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 3px,
+    rgba(4, 7, 15, 0.22) 3px, rgba(4, 7, 15, 0.22) 4px
+  );
+  mix-blend-mode: multiply;
+  opacity: .55;
+}
+
+.bg-glow-a, .bg-glow-b {
+  position: fixed; z-index: 0; pointer-events: none;
+  border-radius: 50%; filter: blur(140px); opacity: .28;
+}
+.bg-glow-a { width: 520px; height: 520px; top: -160px; right: -120px; background: var(--accent-color); }
+.bg-glow-b { width: 460px; height: 460px; bottom: -160px; left: -140px; background: var(--cyan); }
+
+/* ============================================================
+   CUSTOM CURSOR
+   ============================================================ */
+#cursor-dot, #cursor-ring {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 99999;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+
+#cursor-dot {
+  width: 8px; height: 8px;
+  background: var(--accent-color);
+  box-shadow: 0 0 10px var(--accent-glow), 0 0 22px var(--accent-glow);
+}
+
+#cursor-ring {
+  width: 36px; height: 36px;
+  border: 1.5px solid var(--accent-dim);
+  transition: width .22s ease, height .22s ease, border-color .22s ease, background .22s ease, opacity .2s ease;
+}
+
+/* morph state when hovering clickable elements */
+#cursor-ring.hovering {
+  width: 64px; height: 64px;
+  border-color: var(--accent-color);
+  background: rgba(0, 255, 156, 0.08);
+  box-shadow: 0 0 24px var(--accent-glow) inset, 0 0 18px var(--accent-glow);
+}
+
+/* hide custom cursor on touch devices */
+@media (hover: none), (pointer: coarse) {
+  #cursor-dot, #cursor-ring { display: none; }
+  body, a, button { cursor: auto !important; }
+}
+
+/* ============================================================
+   LAYOUT / NAV
+   ============================================================ */
+main { position: relative; z-index: 2; }
+
+.container { width: min(1140px, 92%); margin: 0 auto; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(4, 7, 15, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 255, 156, 0.18);
+}
+
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-weight: 900; font-size: 1.05rem; letter-spacing: 2px;
+  color: var(--accent-color);
+  text-decoration: none;
+  text-shadow: 0 0 14px var(--accent-glow);
+}
+.logo span { color: var(--text-main); text-shadow: none; }
+
+nav ul { display: flex; gap: 26px; list-style: none; }
+nav ul a {
+  color: var(--text-dim); text-decoration: none; font-size: .8rem;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding-bottom: 3px;
+  border-bottom: 1px solid transparent;
+  transition: color .2s, border-color .2s, text-shadow .2s;
+}
+nav ul a:hover {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+  text-shadow: 0 0 12px var(--accent-glow);
+}
+nav ul a i { margin-right: 6px; }
+
+@media (max-width: 640px) {
+  nav ul { gap: 14px; }
+  nav ul a { font-size: .68rem; letter-spacing: 1px; }
+  nav ul a i { display: none; }
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 120px 0 80px;
+  position: relative;
+}
+
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 10px;
+  color: var(--accent-color); font-size: .8rem; letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.hero-tag::before {
+  content: ''; display: block; width: 42px; height: 1px;
+  background: var(--accent-color); box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  font-weight: 900; line-height: 1.05; letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.glitch { position: relative; display: inline-block; color: var(--text-main); }
+.glitch::before, .glitch::after {
+  content: attr(data-text);
+  position: absolute; inset: 0; overflow: hidden;
+  clip-path: inset(0 0 0 0);
+}
+.glitch::before {
+  color: var(--accent-color);
+  text-shadow: -3px 0 var(--accent-glow);
+  animation: glitch-a 3.2s infinite steps(1);
+}
+.glitch::after {
+  color: var(--cyan);
+  text-shadow: 3px 0 rgba(0, 229, 255, .7);
+  animation: glitch-b 2.7s infinite steps(1);
+}
+@keyframes glitch-a {
+  0%, 86%, 100% { clip-path: inset(0 0 100% 0); transform: none; }
+  87% { clip-path: inset(12% 0 76% 0); transform: translateX(-4px); }
+  90% { clip-path: inset(64% 0 18% 0); transform: translateX(4px); }
+  93% { clip-path: inset(28% 0 55% 0); transform: translateX(-2px); }
+  96% { clip-path: inset(80% 0 4% 0); transform: translateX(3px); }
+}
+@keyframes glitch-b {
+  0%, 80%, 100% { clip-path: inset(100% 0 0 0); transform: none; }
+  82% { clip-path: inset(48% 0 40% 0); transform: translateX(3px); }
+  86% { clip-path: inset(6% 0 82% 0); transform: translateX(-3px); }
+  92% { clip-path: inset(70% 0 12% 0); transform: translateX(2px); }
+}
+
+.hero .role {
+  color: var(--accent-color); font-size: clamp(.9rem, 2.2vw, 1.2rem);
+  letter-spacing: 5px; text-transform: uppercase; margin-top: 16px;
+  text-shadow: 0 0 16px var(--accent-glow);
+}
+
+.hero-bio {
+  max-width: 620px; color: var(--text-dim);
+  margin-top: 26px; font-size: .95rem;
+  border-left: 2px solid var(--accent-color);
+  padding-left: 18px;
+}
+
+.hero-cta { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 40px; }
+
+.btn {
+  font-family: var(--font-mono);
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 13px 28px; text-decoration: none; font-size: .82rem;
+  letter-spacing: 3px; text-transform: uppercase;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  transition: box-shadow .25s, background .25s, color .25s, transform .2s;
+}
+.btn-primary {
+  background: var(--accent-color); color: #04140c; font-weight: bold;
+  box-shadow: 0 0 18px var(--accent-dim);
+}
+.btn-primary:hover { box-shadow: 0 0 34px var(--accent-glow); transform: translateY(-2px); }
+.btn-ghost {
+  color: var(--accent-color); border: none;
+  background: rgba(0, 255, 156, 0.05);
+  box-shadow: inset 0 0 0 1px var(--accent-dim);
+}
+.btn-ghost:hover {
+  box-shadow: inset 0 0 0 1px var(--accent-color), 0 0 26px var(--accent-dim);
+  transform: translateY(-2px);
+}
+
+/* hero stat bar */
+.stat-bar {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px; margin-top: 64px;
+}
+.stat {
+  background: rgba(11, 20, 48, .6);
+  border: 1px solid rgba(0, 255, 156, 0.16);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  padding: 18px 20px;
+  backdrop-filter: blur(6px);
+}
+.stat .num {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 1.6rem; color: var(--accent-color);
+  text-shadow: 0 0 14px var(--accent-glow);
+}
+.stat .lbl { font-size: .68rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-top: 4px; }
+
+/* ============================================================
+   SECTION SHELL
+   ============================================================ */
+section { padding: 90px 0; }
+
+.sec-head { margin-bottom: 46px; }
+.sec-head .kicker {
+  color: var(--danger); font-size: .72rem; letter-spacing: 4px;
+  text-transform: uppercase;
+}
+.sec-head h2 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(1.5rem, 4vw, 2.2rem); letter-spacing: 3px;
+  text-transform: uppercase; margin-top: 8px;
+}
+.sec-head h2 em {
+  font-style: normal; color: var(--accent-color);
+  text-shadow: 0 0 18px var(--accent-glow);
+}
+.sec-head .rule {
+  height: 1px; margin-top: 18px;
+  background: linear-gradient(90deg, var(--accent-color), transparent 70%);
+  box-shadow: 0 0 10px var(--accent-dim);
+}
+
+/* ============================================================
+   PROJECTS (GitHub repos)
+   ============================================================ */
+.repos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  perspective: 1200px;
+}
+
+.repo-card {
+  position: relative;
+  background: linear-gradient(160deg, rgba(11,20,48,.92), rgba(7,13,31,.92));
+  border: 1px solid rgba(0, 255, 156, 0.2);
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+  padding: 26px 24px 22px;
+  transform-style: preserve-3d;
+  transition: border-color .25s, box-shadow .25s;
+  display: flex; flex-direction: column; gap: 14px;
+  will-change: transform;
+}
+.repo-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; width: 46px; height: 46px;
+  border-top: 2px solid var(--accent-color);
+  border-left: 2px solid var(--accent-color);
+  filter: drop-shadow(0 0 6px var(--accent-glow));
+}
+.repo-card:hover {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 32px rgba(0, 255, 156, 0.14), 0 24px 46px rgba(0,0,0,.5);
+}
+
+.repo-card .corner-id {
+  position: absolute; top: 12px; right: 16px;
+  font-size: .62rem; color: var(--danger); letter-spacing: 2px;
+}
+
+.repo-card h3 {
+  font-family: var(--font-display); font-size: .98rem; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  transform: translateZ(30px);
+}
+.repo-card h3 a { color: var(--text-main); text-decoration: none; transition: color .2s; }
+.repo-card h3 a:hover { color: var(--accent-color); text-shadow: 0 0 12px var(--accent-glow); }
+
+.repo-card .desc {
+  color: var(--text-dim); font-size: .82rem; flex: 1;
+  transform: translateZ(20px);
+}
+.repo-card .desc.empty { opacity: .55; font-style: italic; }
+
+.repo-meta {
+  display: flex; align-items: center; gap: 18px;
+  font-size: .74rem; color: var(--text-dim);
+  border-top: 1px dashed rgba(0,255,156,.18); padding-top: 12px;
+  transform: translateZ(15px);
+}
+.repo-meta .stars { color: #ffd166; }
+.repo-meta .lang { display: inline-flex; align-items: center; gap: 7px; }
+.repo-meta .lang::before {
+  content: ''; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--dot, var(--cyan));
+  box-shadow: 0 0 8px var(--dot, var(--cyan));
+}
+.repo-meta .forks i { color: var(--cyan); }
+.repo-meta a.gh-link { margin-left: auto; color: var(--accent-color); text-decoration: none; letter-spacing: 1px; }
+.repo-meta a.gh-link:hover { text-shadow: 0 0 10px var(--accent-glow); }
+
+.loading-hint {
+  grid-column: 1 / -1; text-align: center; color: var(--text-dim);
+  letter-spacing: 3px; text-transform: uppercase; font-size: .8rem;
+  padding: 40px 0;
+}
+.loading-hint .blink { animation: blink 1s steps(2) infinite; color: var(--accent-color); }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ============================================================
+   ABOUT / TERMINAL
+   ============================================================ */
+.terminal {
+  background: rgba(4, 7, 15, .85);
+  border: 1px solid rgba(0, 255, 156, 0.25);
+  box-shadow: 0 0 40px rgba(0, 255, 156, 0.07), inset 0 0 60px rgba(0,0,0,.5);
+  font-family: var(--font-mono);
+}
+.term-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(0, 255, 156, 0.06);
+  border-bottom: 1px solid rgba(0, 255, 156, 0.25);
+  padding: 10px 16px;
+}
+.term-bar .dot { width: 11px; height: 11px; border-radius: 50%; }
+.term-bar .dot:nth-child(1) { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+.term-bar .dot:nth-child(2) { background: #ffd166; box-shadow: 0 0 8px #ffd166; }
+.term-bar .dot:nth-child(3) { background: var(--accent-color); box-shadow: 0 0 8px var(--accent-glow); }
+.term-bar .title { margin-left: 12px; font-size: .72rem; color: var(--text-dim); letter-spacing: 2px; }
+
+.term-body { padding: 26px 24px 30px; font-size: .9rem; line-height: 2; }
+.term-body .ln { display: block; }
+.term-body .prompt { color: var(--accent-color); }
+.term-body .cmd { color: var(--text-main); }
+.term-body .out { color: var(--text-dim); }
+.term-body .hi { color: var(--cyan); }
+.term-body .ok { color: var(--accent-color); }
+.term-caret { display: inline-block; width: 9px; height: 18px; background: var(--accent-color);
+  vertical-align: middle; box-shadow: 0 0 8px var(--accent-glow); animation: blink 1s steps(2) infinite; }
+
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;
+}
+.about-visual { display: flex; flex-direction: column; gap: 22px; }
+
+.profile-frame {
+  position: relative; padding: 14px;
+  background: rgba(11, 20, 48, .6);
+  border: 1px solid rgba(0, 255, 156, 0.3);
+  clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px);
+  max-width: 340px;
+}
+.profile-frame img {
+  display: block; width: 100%; aspect-ratio: 1;
+  object-fit: cover;
+  filter: saturate(1.15) contrast(1.05);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+.profile-frame .scan {
+  position: absolute; left: 14px; right: 14px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+  box-shadow: 0 0 14px var(--accent-glow);
+  animation: scan 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes scan {
+  0%, 100% { top: 14px; opacity: 0; }
+  10% { opacity: 1; }
+  50% { top: calc(100% - 16px); opacity: 1; }
+  60% { opacity: 0; }
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 10px; max-width: 340px; }
+.chip {
+  font-size: .68rem; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent-color); padding: 7px 14px;
+  background: rgba(0, 255, 156, 0.05);
+  box-shadow: inset 0 0 0 1px var(--accent-dim);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  transition: background .2s, box-shadow .2s;
+}
+.chip:hover { background: rgba(0, 255, 156, 0.12); box-shadow: inset 0 0 0 1px var(--accent-color), 0 0 16px var(--accent-dim); }
+
+@media (max-width: 860px) {
+  .about-grid { grid-template-columns: 1fr; }
+  .about-visual { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .profile-frame { max-width: 250px; }
+}
+
+/* ============================================================
+   CONTACT / FOOTER
+   ============================================================ */
+.contact-wrap { text-align: center; }
+.socials { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; margin-top: 36px; }
+.social {
+  width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.35rem; color: var(--accent-color); text-decoration: none;
+  background: rgba(11, 20, 48, .6);
+  border: 1px solid var(--accent-dim);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  transition: background .25s, box-shadow .25s, transform .2s, color .25s;
+}
+.social:hover {
+  background: var(--accent-color); color: #04140c;
+  box-shadow: 0 0 34px var(--accent-glow);
+  transform: translateY(-4px);
+}
+.social.gh:hover { background: var(--accent-color); }
+.social.li:hover { background: var(--cyan); color: #041420; box-shadow: 0 0 34px rgba(0,229,255,.6); }
+
+footer {
+  border-top: 1px solid rgba(0, 255, 156, 0.15);
+  padding: 26px 0; text-align: center;
+  color: var(--text-dim); font-size: .74rem; letter-spacing: 2px;
+}
+footer .accent { color: var(--accent-color); }
+
+/* reveal-on-scroll base state (GSAP/IO will animate these in) */
+.reveal { opacity: 0; transform: translateY(40px); }
+</style>
+</head>
+<body>
+
+<!-- ======================= CUSTOM CURSOR ======================= -->
+<div id="cursor-ring" aria-hidden="true"></div>
+<div id="cursor-dot" aria-hidden="true"></div>
+
+<!-- ======================= BACKGROUND FX ======================= -->
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-glow-a" aria-hidden="true"></div>
+<div class="bg-glow-b" aria-hidden="true"></div>
+<div class="bg-scanlines" aria-hidden="true"></div>
+
+<!-- ======================= NAV ======================= -->
+<nav>
+  <div class="container nav-inner">
+    <a class="logo" href="#top">MERRIC<span>_</span>CMD</a>
+    <ul>
+      <li><a href="#projects"><i class="fa-solid fa-diagram-project"></i>Projects</a></li>
+      <li><a href="#about"><i class="fa-solid fa-terminal"></i>About</a></li>
+      <li><a href="#contact"><i class="fa-solid fa-satellite-dish"></i>Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main id="top">
+
+  <!-- ======================= HERO ======================= -->
+  <header class="hero">
+    <div class="container">
+      <div class="hero-tag hero-el">System online // Portfolio v2.0</div>
+      <h1 class="hero-el">
+        <span class="glitch" data-text="MERRIC">MERRIC</span>
+        <span class="glitch" data-text="COSTA">COSTA</span>
+      </h1>
+      <div class="role hero-el">>_ Computer Engineer &nbsp;·&nbsp; Cloud Explorer &nbsp;·&nbsp; Tech Builder</div>
+
+      <p class="hero-bio hero-el">
+        I am a Computer Engineering student with an interest in software development, cloud computing,
+        and emerging technologies. I enjoy learning new technical skills, working on practical projects,
+        and exploring technology-based solutions to real-world problems — building toward a strong
+        career in the technology industry.
+      </p>
+
+      <div class="hero-cta hero-el">
+        <a class="btn btn-primary" href="#projects"><i class="fa-brands fa-github"></i> View Projects</a>
+        <a class="btn btn-ghost" href="#contact"><i class="fa-solid fa-satellite-dish"></i> Contact Me</a>
+      </div>
+
+      <!-- Live GitHub stats (filled by JS) -->
+      <div class="stat-bar hero-el" id="stat-bar">
+        <div class="stat"><div class="num" id="stat-repos">--</div><div class="lbl">Public Repos</div></div>
+        <div class="stat"><div class="num" id="stat-followers">--</div><div class="lbl">Followers</div></div>
+        <div class="stat"><div class="num" id="stat-following">--</div><div class="lbl">Following</div></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================= PROJECTS ======================= -->
+  <section id="projects">
+    <div class="container">
+      <div class="sec-head reveal">
+        <div class="kicker">// git log --top</div>
+        <h2>Featured <em>Repositories</em></h2>
+        <div class="rule"></div>
+      </div>
+
+      <div class="repos-grid" id="repos-grid">
+        <div class="loading-hint">Establishing uplink to GitHub API <span class="blink">▊</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= ABOUT ======================= -->
+  <section id="about">
+    <div class="container">
+      <div class="sec-head reveal">
+        <div class="kicker">// cat about_me.txt</div>
+        <h2>About <em>The Operator</em></h2>
+        <div class="rule"></div>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-visual reveal">
+          <div class="profile-frame">
+            <img id="gh-avatar" src="https://github.com/merric-cmd.png" alt="Merric Costa on GitHub" />
+            <div class="scan"></div>
+          </div>
+          <div class="chips">
+            <span class="chip">Software Dev</span>
+            <span class="chip">Cloud Computing</span>
+            <span class="chip">Emerging Tech</span>
+            <span class="chip">Problem Solving</span>
+            <span class="chip">Hands-on Learning</span>
+          </div>
+        </div>
+
+        <div class="terminal reveal">
+          <div class="term-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="title">merric@mainframe: ~/profile</span>
+          </div>
+          <div class="term-body">
+            <span class="ln"><span class="prompt">merric@mainframe:~$</span> <span class="cmd">whoami</span></span>
+            <span class="ln out">Computer Engineering student focused on <span class="hi">software development</span>, <span class="hi">cloud computing</span> and <span class="hi">emerging technologies</span>.</span>
+            <span class="ln"><span class="prompt">merric@mainframe:~$</span> <span class="cmd">cat mission.txt</span></span>
+            <span class="ln out">Learning new technical skills. Building practical projects. Solving real-world problems with technology.</span>
+            <span class="ln"><span class="prompt">merric@mainframe:~$</span> <span class="cmd">./run --goal</span></span>
+            <span class="ln ok">[ OK ] Building a strong career in the technology industry.</span>
+            <span class="ln"><span class="prompt">merric@mainframe:~$</span> <span class="term-caret"></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= CONTACT ======================= -->
+  <section id="contact">
+    <div class="container contact-wrap">
+      <div class="sec-head reveal" style="text-align:center">
+        <div class="kicker">// open_channel --secure</div>
+        <h2>Establish <em>Connection</em></h2>
+        <div class="rule" style="margin-left:auto;margin-right:auto;background:linear-gradient(90deg,transparent,var(--accent-color),transparent);"></div>
+      </div>
+      <p class="reveal" style="color:var(--text-dim);max-width:560px;margin:0 auto;font-size:.9rem;">
+        Interested in collaborating on a project, or just want to talk tech?
+        My channels are open — pick a frequency below.
+      </p>
+      <div class="socials reveal">
+        <a class="social gh" href="https://github.com/merric-cmd" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub"><i class="fa-brands fa-github"></i></a>
+        <a class="social li" href="https://www.linkedin.com/in/merric-costa-90bb57430" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container">
+    </> crafted with <span class="accent">vanilla JS</span> + <span class="accent">GSAP</span> · data streamed live from the GitHub API · © <span id="year"></span> MERRIC COSTA
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   1. CUSTOM CURSOR — vanilla JS, tracks mouse, morphs on hover
+   ============================================================ */
+(function initCursor() {
+  const dot  = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  if (!dot || !ring) return;
+
+  let mouseX = -100, mouseY = -100;   // raw pointer position
+  let ringX = -100, ringY = -100;    // ring eases toward pointer
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    // dot follows instantly
+    dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+  });
+
+  // ring lags behind with easing (requestAnimationFrame loop)
+  (function followRing() {
+    ringX += (mouseX - ringX) * 0.16;
+    ringY += (mouseY - ringY) * 0.16;
+    ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+    requestAnimationFrame(followRing);
+  })();
+
+  // morph when hovering anything clickable
+  const hoverables = 'a, button, .tilt-card, .repo-card, .chip, .social, input, textarea, [role="button"]';
+  document.addEventListener('mouseover', (e) => {
+    if (e.target.closest(hoverables)) ring.classList.add('hovering');
+  });
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest(hoverables)) ring.classList.remove('hovering');
+  });
+
+  // hide when leaving the window
+  document.addEventListener('mouseleave', () => { dot.style.opacity = 0; ring.style.opacity = 0; });
+  document.addEventListener('mouseenter', () => { dot.style.opacity = 1; ring.style.opacity = 1; });
+})();
+
+/* ============================================================
+   2. 3D TILT — vanilla mousemove tilt for cards
+   ============================================================ */
+function attachTilt(card, maxTilt = 10) {
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;   // 0 → 1
+    const py = (e.clientY - rect.top) / rect.height;   // 0 → 1
+    const rotateY = (px - 0.5) * maxTilt * 2;
+    const rotateX = (0.5 - py) * maxTilt * 2;
+    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(0)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+  });
+}
+
+/* ============================================================
+   3. GITHUB API — live profile + repos (username hardcoded)
+   ============================================================ */
+const GITHUB_USERNAME = 'merric-cmd';
+
+async function fetchJSON(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`GitHub API ${res.status} for ${url}`);
+  return res.json();
+}
+
+function langColor(lang) {
+  const map = {
+    JavaScript: '#f1e05a', TypeScript: '#3178c6', Python: '#3572A5',
+    Java: '#b07219', 'C++': '#f34b7d', C: '#555555', 'C#': '#178600',
+    HTML: '#e34c26', CSS: '#563d7c', Shell: '#89e051', Go: '#00ADD8',
+    Rust: '#dea584', PHP: '#4F5D95', Dart: '#00B4AB', Kotlin: '#A97BFF',
+    Jupyter: '#DA5B0B', 'Jupyter Notebook': '#DA5B0B', Vue: '#41b883'
+  };
+  return map[lang] || '#00e5ff';
+}
+
+async function loadGitHub() {
+  const grid = document.getElementById('repos-grid');
+
+  try {
+    const [user, repos] = await Promise.all([
+      fetchJSON(`https://api.github.com/users/${GITHUB_USERNAME}`),
+      fetchJSON(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`)
+    ]);
+
+    // ---- hero stats ----
+    document.getElementById('stat-repos').textContent = user.public_repos ?? '0';
+    document.getElementById('stat-followers').textContent = user.followers ?? '0';
+    document.getElementById('stat-following').textContent = user.following ?? '0';
+
+    // ---- avatar (with fallback already set in HTML) ----
+    if (user.avatar_url) {
+      document.getElementById('gh-avatar').src = user.avatar_url;
+    }
+
+    // ---- top repos by stars ----
+    const top = repos
+      .filter(r => !r.fork)                                  // original work only
+      .sort((a, b) => b.stargazers_count - a.stargazers_count)
+      .slice(0, 6);
+
+    grid.innerHTML = '';
+
+    if (top.length === 0) {
+      grid.innerHTML = '<div class="loading-hint">No public repositories found for this user.</div>';
+      return;
+    }
+
+    top.forEach((repo, i) => {
+      const card = document.createElement('article');
+      card.className = 'repo-card tilt-card';
+      card.setAttribute('data-tilt', '');
+      card.innerHTML = `
+        <span class="corner-id">${String(i + 1).padStart(2, '0')}</span>
+        <h3><a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">${repo.name}</a></h3>
+        <p class="desc ${repo.description ? '' : 'empty'}">${repo.description ? escapeHTML(repo.description) : '// no description transmitted'}</p>
+        <div class="repo-meta">
+          ${repo.language ? `<span class="lang" style="--dot:${langColor(repo.language)}">${repo.language}</span>` : ''}
+          <span class="stars"><i class="fa-solid fa-star"></i> ${repo.stargazers_count}</span>
+          <span class="forks"><i class="fa-solid fa-code-fork"></i> ${repo.forks_count}</span>
+          <a class="gh-link" href="${repo.html_url}" target="_blank" rel="noopener noreferrer">VISIT <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </div>
+      `;
+      grid.appendChild(card);
+      attachTilt(card);
+    });
+
+    // scroll-in animation for freshly injected cards
+    observeReveals();
+
+  } catch (err) {
+    console.error('GitHub fetch failed:', err);
+    grid.innerHTML = `
+      <div class="loading-hint">
+        <i class="fa-solid fa-triangle-exclamation" style="color:var(--danger);font-size:1.4rem;"></i><br><br>
+        Uplink to GitHub failed — API rate limit or offline.<br>
+        Browse directly at <a href="https://github.com/${GITHUB_USERNAME}" target="_blank" rel="noopener noreferrer" style="color:var(--accent-color);">github.com/${GITHUB_USERNAME}</a>
+      </div>`;
+  }
+}
+
+function escapeHTML(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* ============================================================
+   4. SCROLL REVEALS — GSAP ScrollTrigger (with IO fallback)
+   ============================================================ */
+function observeReveals() {
+  if (window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.reveal:not(.gsap-set), .repo-card').forEach((el) => {
+      el.classList.add('gsap-set');
+      gsap.fromTo(el,
+        { opacity: 0, y: 44 },
+        {
+          opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+          onStart: () => el.classList.add('gsap-done')
+        }
+      );
+    });
+  } else {
+    // Intersection Observer fallback
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if (en.isIntersecting) {
+          en.target.style.opacity = 1;
+          en.target.style.transform = 'translateY(0)';
+          en.target.style.transition = 'opacity .7s ease, transform .7s ease';
+          io.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal, .repo-card').forEach(el => io.observe(el));
+  }
+}
+
+/* ============================================================
+   5. HERO ENTRANCE — GSAP timeline
+   ============================================================ */
+function heroEntrance() {
+  if (!window.gsap) return;
+  gsap.fromTo('.hero-el',
+    { opacity: 0, y: 34, filter: 'blur(6px)' },
+    { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out', stagger: 0.12, delay: 0.15 }
+  );
+  gsap.fromTo('nav', { y: -70, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power2.out' });
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+document.getElementById('year').textContent = new Date().getFullYear();
+heroEntrance();
+observeReveals();
+loadGitHub();
+</script>
+</body>
+</html>
